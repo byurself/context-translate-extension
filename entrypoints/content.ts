@@ -18,6 +18,7 @@ const TRANSLATION_ATTR = 'data-context-translate';
 const ORIGINAL_ATTR = 'data-context-translate-original';
 const PROGRESS_ROOT_ID = 'context-translate-progress';
 const BLOCK_SELECTOR = 'p, li, h1, h2, h3, h4, h5, h6, blockquote, figcaption';
+const MAX_PAGE_BLOCK_TEXT_LENGTH = 4000;
 const SKIP_SELECTOR = [
   'script',
   'style',
@@ -335,20 +336,23 @@ function extractTextBlocks(): TextBlock[] {
     node = walker.nextNode();
   }
 
+  const createdAt = Date.now();
   const blocks = Array.from(grouped.entries())
-    .map(([element, parts], index) => {
+    .flatMap(([element, parts], index) => {
       const text = parts.join(' ').replace(/\s+/g, ' ').trim();
-      const id = `ct-block-${Date.now()}-${index}`;
+      if (text.length < 8 || text.length > MAX_PAGE_BLOCK_TEXT_LENGTH) {
+        return [];
+      }
+
+      const id = `ct-block-${createdAt}-${index}`;
       blockElements.set(id, element);
 
-      return {
+      return [{
         id,
         text,
         kind: element.tagName.toLowerCase(),
-      };
-    })
-    .filter((block) => block.text.length >= 8 && block.text.length <= 1800)
-    .slice(0, 60);
+      }];
+    });
 
   return blocks.map((block, index) => ({
     ...block,

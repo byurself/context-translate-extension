@@ -182,7 +182,7 @@ The extension requests:
   items, headings, block quotes, and figcaptions.
 - Code blocks, forms, navigation areas, tables, and common repository UI regions
   are skipped to avoid breaking page interactions.
-- A single page translation run is capped to a limited number of text blocks to
-  keep requests predictable.
+- Full-page translation processes all extracted readable blocks. Exceptionally
+  long individual blocks are skipped to keep provider requests reliable.
 - Browser-level keyboard shortcuts are not wired yet; the current controls are
   the popup, selected-text tooltip, and context menus.
