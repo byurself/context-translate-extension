@@ -8,7 +8,7 @@ on:
 
 jobs:
   package:
-    name: Build and upload zip
+    name: Build and upload extension
     runs-on: ubuntu-latest
 
     steps:
@@ -36,22 +36,23 @@ jobs:
       - name: Package extension zip
         run: pnpm zip
 
-      - name: Collect zip artifact
+      - name: Prepare one-unzip artifact
         run: |
-          mkdir -p artifacts
+          rm -rf artifacts
+          mkdir -p artifacts/context-translate-extension
           zip_file="$(find .output -maxdepth 1 -type f -name '*.zip' -print -quit)"
           if [ -z "$zip_file" ]; then
             echo "No zip file was produced by pnpm zip."
             find .output -maxdepth 2 -type f -print || true
             exit 1
           fi
-          cp "$zip_file" artifacts/context-translate-extension.zip
+          unzip -q "$zip_file" -d artifacts/context-translate-extension
           ls -lah artifacts
+          ls -lah artifacts/context-translate-extension
 
-      - name: Upload zip artifact
+      - name: Upload extension artifact
         uses: actions/upload-artifact@v7
         with:
           name: context-translate-extension
-          path: artifacts/context-translate-extension.zip
+          path: artifacts
           if-no-files-found: error
-          compression-level: 0
